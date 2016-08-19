@@ -1,9 +1,11 @@
 package travelbird.com.travelbirdweather;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.filters.SdkSuppress;
+import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.UiDevice;
@@ -14,111 +16,125 @@ import android.support.test.uiautomator.Until;
 import android.util.Log;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import travelbird.com.travelbirdweather.activity.WeatherActivity;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 
+
 @RunWith(AndroidJUnit4.class)
-@SdkSuppress(minSdkVersion = 18)
+@LargeTest
 public class WeatherActivityShould {
     private static final String BASIC_SAMPLE_PACKAGE = "travelbird.com.travelbirdweather";
     private static final int LAUNCH_TIMEOUT = 5000;
-    private static final String STRING_TO_BE_TYPED = "UiAutomator";
     private UiDevice mDevice;
 
-    @Before
-    public void startMainActivityFromHomeScreen() {
-        // Initialize UiDevice instance
-        mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-
-        // Start from the home screen
-        mDevice.pressHome();
-
-        // Wait for launcher
-        final String launcherPackage = mDevice.getLauncherPackageName();
-        assertThat(launcherPackage, notNullValue());
-        mDevice.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)),
-                LAUNCH_TIMEOUT);
-
-        // Launch the app
-        Context context = InstrumentationRegistry.getContext();
-        final Intent intent = context.getPackageManager()
-                .getLaunchIntentForPackage(BASIC_SAMPLE_PACKAGE);
-        // Clear out any previous instances
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        context.startActivity(intent);
-
-        // Wait for the app to appear
-        mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
-                LAUNCH_TIMEOUT);
-    }
-
-    @Test
-    public void see_enter_city_text_area() {
-        /*
-        onView(withId(R.id.place_autocomplete_search_input)).check(matches(isDisplayed()));*/
-
-        UiObject area = mDevice.findObject(new UiSelector()
-                .text("Enter city"));
-        if (area.exists()) {
-            try {
-                area.click();
-                mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
-                        LAUNCH_TIMEOUT);
-
-                UiSelector selector = new UiSelector()
-                        .text("Search").className("android.widget.EditText");
-                UiObject searchField = mDevice.findObject(selector);
-                if (searchField.exists()) {
-                    Log.e("UI :", "exists");
-                    searchField.setText("bang");
-
-                    mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
-                            LAUNCH_TIMEOUT);
-                }
-
-                UiObject listItem = mDevice.findObject(new UiSelector().className("android.widget.TextView").text("Bangalore"));
-                if (listItem.exists()) {
-                    listItem.click();
-
-                    mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
-                            LAUNCH_TIMEOUT);
-                }
-            } catch (UiObjectNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    }
-
-
-   /* private static final String BANGALORE = "bang";
     @Rule
     public ActivityTestRule<WeatherActivity> mActivityRule = new ActivityTestRule(WeatherActivity.class);
 
-
-   *//* @Test
-    public void see_enter_city_text_area() {
-        onView(withId(R.id.place_autocomplete_search_input)).check(matches(isDisplayed()));
-    }*//*
-
-    @Test
-    public void enter_city_name_text_area() {
-        onView(withId(com.google.android.gms.R.id.place_autocomplete_search_input)).perform(ViewActions.click());
-
-
-        ArrayList<View> views = new ArrayList<>();
-         getAutoCompleteFragment().getView().findViewsWithText(views,"Enter city",View.FIND_VIEWS_WITH_TEXT);
-
-        Log.e("Espresso :", views.get(0).getId() + "");
-       // onView(withId(id)).check(matches(isDisplayed()));
+    @Before
+    public void setUp() {
+        // Initialize UiDevice instance
+        mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
     }
 
-    private PlaceAutocompleteFragment getAutoCompleteFragment() {
+    @Test
+    public void see_enter_city_text_area() {
+        onView(withId(R.id.place_autocomplete_search_input)).check(matches(isDisplayed()));
 
-        return (PlaceAutocompleteFragment) mActivityRule.getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-    }*/
+    }
+
+    @Test
+    public void enter_city_name_display_search_results() throws UiObjectNotFoundException {
+        onView(withId(com.google.android.gms.R.id.place_autocomplete_search_input)).perform(click());
+
+        mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
+                LAUNCH_TIMEOUT);
+
+        UiObject searchField = mDevice.findObject(new UiSelector()
+                .text("Search").className("android.widget.EditText"));
+        if (searchField.exists()) {
+            Log.e("UI :", "exists");
+            searchField.setText("bang");
+
+            mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
+                    LAUNCH_TIMEOUT);
+
+            UiSelector listSelector = new UiSelector().className("android.support.v7.widget.RecyclerView");
+            mDevice.findObject(listSelector);
+
+            mDevice.pressBack();
+            mDevice.pressBack();
+        }
+    }
+
+    @Test
+    public void get_weather_condition_for_city() throws UiObjectNotFoundException {
+        onView(withId(com.google.android.gms.R.id.place_autocomplete_search_input)).perform(click());
+
+        mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
+                LAUNCH_TIMEOUT);
+
+        UiObject searchField = mDevice.findObject(new UiSelector()
+                .text("Search").className("android.widget.EditText"));
+        if (searchField.exists()) {
+            Log.e("UI :", "exists");
+            searchField.setText("bang");
+
+            mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
+                    LAUNCH_TIMEOUT);
+
+            UiSelector listSelector = new UiSelector().className("android.support.v7.widget.RecyclerView");
+
+
+            UiObject recycler = mDevice.findObject(listSelector);
+
+            if (recycler.exists()) {
+                UiSelector child = new UiSelector().className("android.widget.TextView").text("Bangalore");
+                recycler.getChild(child).click();
+            }
+
+            mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
+                    LAUNCH_TIMEOUT);
+
+
+            mDevice.findObject(new UiSelector().resourceId("travelbird.com.travelbirdweather:id/title"));
+
+            mDevice.pressBack();
+            mDevice.pressBack();
+        }
+    }
+
+    @Test
+    public void show_error_for_invalid_city_text() throws UiObjectNotFoundException {
+        onView(withId(com.google.android.gms.R.id.place_autocomplete_search_input)).perform(click());
+
+        mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
+                LAUNCH_TIMEOUT);
+
+        UiObject searchField = mDevice.findObject(new UiSelector()
+                .text("Search").className("android.widget.EditText"));
+        if (searchField.exists()) {
+            searchField.setText("tyyuuuuuuuui");
+
+            mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)),
+                    LAUNCH_TIMEOUT);
+
+            UiSelector error = new UiSelector().resourceId("com.google.android.gms:id/error");
+            mDevice.findObject(error);
+
+            mDevice.pressBack();
+            mDevice.pressBack();
+        }
+    }
+
 }
