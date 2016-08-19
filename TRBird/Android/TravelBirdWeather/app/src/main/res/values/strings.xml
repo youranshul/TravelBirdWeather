@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">TravelBirdWeather</string>
+    <string name="action_settings">Settings</string>
+    <string name="generic_error">Error!Please try again.</string>
+    <string name="date">Date :</string>
+    <string name="temp">Temperature :</string>
+    <string name="hi_temp">Hi Temperature :</string>
+    <string name="lo_temp">Lo Temperature :</string>
+    <string name="search_hint">Enter city</string>
+    <string name="getting_weather">Getting weather report</string>
+</resources>
+
+  <!--  <?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+package="travelbird.com.travelbirdweather">
+
+<uses-permission android:name="android.permission.INTERNET" />
+
+<application
+    android:name=".activity.WeatherApplication"
+    android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:supportsRtl="true"
+    android:theme="@style/AppTheme">
+    <activity
+        android:name=".activity.WeatherActivity"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme.NoActionBar">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyA4bXxngq-vFEygNv1fb-Dwhe5hfHdt9c4" />
+</application>
+
+</manifest>-->
